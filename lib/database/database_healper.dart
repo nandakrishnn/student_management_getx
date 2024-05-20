@@ -26,12 +26,12 @@ class DatabaseHealper {
   Future<void> _onCreate(Database db, int version) async {
     await db.execute('''
       CREATE TABLE $table(
-        $columnId INTEGER PRIMARY KEY AUTOINCREMENT
+        $columnId INTEGER PRIMARY KEY AUTOINCREMENT,
         $columnName TEXT NOT NULL,
         $columnSchoolName TEXT NOT NULL,
         $columnFatherName TEXT NOT NULL,
         $columnage INTEGER NOT NULL,
-        $imageurl TEXT NOT NULL,
+        $imageurl TEXT NOT NULL
 
       )
 ''');
@@ -51,7 +51,7 @@ class DatabaseHealper {
   Future<List<Student>> getStudent() async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(table);
-   return List.generate(
+    return List.generate(
         maps.length,
         (index) => Student(
             imageurl: maps[index][imageurl],
@@ -60,5 +60,25 @@ class DatabaseHealper {
             age: maps[index][columnage],
             fathername: maps[index][columnFatherName],
             schoolname: maps[index][columnSchoolName]));
+  }
+
+  Future<int> deleteStudent(int id) async {
+    final db = await database;
+    return await db.delete(table, where: '$columnId=?', whereArgs: [id]);
+  }
+
+  Future<int> updatedStudent(Student student)async{
+    final db=await database;
+    return await db.update(table, {
+      columnName:student.studentname,
+      columnSchoolName:student.schoolname,
+      columnFatherName:student.fathername,
+      columnage:student.age,
+      imageurl:student.imageurl
+    },
+    where: '$columnId=?',
+    whereArgs: [student.id]
+    );
+
   }
 }
